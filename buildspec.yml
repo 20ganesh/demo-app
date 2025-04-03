@@ -1,19 +1,33 @@
 version: 0.2
 
 phases:
+
   install:
-     commands:
-       - echo Installing NGINX
-       - apt-get update
-       - apt -get install nginx -y
+
+    commands:
+
+      - echo "Installing IIS (Windows Web Server)"
+
+      - powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools
+
   build:
+
     commands:
-      - echo Build started on 'date'
-      - cp index.html var/www/html/
+
+      - echo "Build started on $(Get-Date)"
+
+      - Copy-Item index.html -Destination "C:\inetpub\wwwroot\"
+
   post_build:
+
     commands:
-      -echo configuring NGINX
+
+      - echo "Configuring IIS"
+
+      - powershell Restart-Service W3SVC
 
 artifacts:
-   files:
-      
+
+  files:
+
+    - index.html 
