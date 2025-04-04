@@ -6,27 +6,37 @@ phases:
 
     commands:
 
-      - echo "Installing Chocolatey..."
+      - echo "Setting execution policy..."
 
-      - powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+      - powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force"
 
-      - echo "Adding Chocolatey to PATH..."
+      - echo "Checking if Chocolatey is installed..."
+
+      - if not exist "C:\ProgramData\chocolatey\bin\choco.exe" (
+
+            echo "Installing Chocolatey..." &&
+
+            powershell -Command "[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+
+        ) else (
+
+            echo "Chocolatey already installed."
+
+        )
+
+      - echo "Refreshing environment..."
 
       - set "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
 
+      - echo "Verifying Chocolatey..."
+
+      - choco -v
+
       - echo "Installing Nginx..."
 
-      - choco install nginx -y
+      - choco install nginx -y --force
 
       - echo "Nginx installation completed."
-
-  pre_build:
-
-    commands:
-
-      - echo "Verifying Nginx installation..."
-
-      - if exist "C:\tools\nginx\nginx.exe" (echo "Nginx installed successfully.") else (echo "Nginx installation failed!" && exit 1)
 
   build:
 
@@ -36,19 +46,13 @@ phases:
 
       - Start-Process -FilePath "C:\tools\nginx\nginx.exe" -NoNewWindow
 
-      - echo "Waiting for Nginx to start..."
-
-      - Start-Sleep -s 5
-
-      - echo "Checking running processes..."
-
-      - Get-Process nginx
+      - echo "Nginx started."
 
   post_build:
 
     commands:
 
-      - echo "Configuring firewall rule for Nginx..."
+      - echo "Allowing Nginx through firewall..."
 
       - powershell -Command "New-NetFirewallRule -DisplayName 'Allow Nginx' -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow"
 
