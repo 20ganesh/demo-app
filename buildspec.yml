@@ -12,21 +12,11 @@ phases:
 
       - echo "Checking if Chocolatey is installed..."
 
-      - if exist "C:\ProgramData\chocolatey\bin\choco.exe" (
-
-            echo "Chocolatey already installed."
-
-        ) else (
-
-            echo "Installing Chocolatey..."
-
-            powershell -Command "[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
-
-        )
+      - powershell -Command "if (!(Test-Path 'C:\ProgramData\chocolatey\bin\choco.exe')) { Write-Host 'Installing Chocolatey...'; [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) } else { Write-Host 'Chocolatey already installed.' }"
 
       - echo "Refreshing environment..."
 
-      - refreshenv || echo "refreshenv command not found"
+      - powershell -Command "refreshenv" || echo "refreshenv command not found"
 
       - echo "Verifying Chocolatey installation..."
 
