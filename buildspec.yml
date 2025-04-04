@@ -6,27 +6,39 @@ phases:
 
     commands:
 
-      - echo "Downloading and installing Nginx for Windows"
+      - echo "Installing Chocolatey Package Manager..."
 
-      - powershell Invoke-WebRequest -Uri "https://nginx.org/download/nginx-1.24.0.zip" -OutFile "C:\nginx.zip"
+      - setx PATH "%PATH%;C:\ProgramData\chocolatey\bin"
 
-      - powershell Expand-Archive -Path "C:\nginx.zip" -DestinationPath "C:\"
+      - powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+
+      - refreshenv
+
+      - echo "Installing Nginx using Chocolatey..."
+
+      - choco install nginx -y
+
+      - echo "Nginx installation completed."
 
   build:
 
     commands:
 
-      - echo "Starting Nginx"
+      - echo "Starting Nginx..."
 
-      - powershell Start-Process -FilePath "C:\nginx\nginx.exe" -NoNewWindow -Wait
+      - powershell Start-Process -FilePath "C:\tools\nginx\nginx.exe" -NoNewWindow -PassThru
+
+      - sleep 5
+
+      - powershell Get-Process nginx
 
   post_build:
 
     commands:
 
-      - echo "Allowing Nginx in firewall"
+      - echo "Allowing traffic on port 80 for Nginx..."
 
-      - powershell New-NetFirewallRule -DisplayName "Allow Nginx" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+      - netsh advfirewall firewall add rule name="Allow Nginx" dir=in action=allow protocol=TCP localport=80
 
 artifacts:
 
