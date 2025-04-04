@@ -6,9 +6,13 @@ phases:
 
     commands:
 
-      - echo "Installing IIS (Windows Web Server)"
+      - echo "Downloading and installing Nginx for Windows"
 
-      - powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools
+      - powershell Invoke-WebRequest -Uri "https://nginx.org/download/nginx-1.24.0.zip" -OutFile "nginx.zip"
+
+      - powershell Expand-Archive nginx.zip -DestinationPath C:\nginx
+
+      - powershell Start-Process -FilePath "C:\nginx\nginx.exe"
 
   build:
 
@@ -16,15 +20,17 @@ phases:
 
       - echo "Build started on $(Get-Date)"
 
-      - Copy-Item index.html -Destination "C:\inetpub\wwwroot\"
+      - Copy-Item index.html -Destination "C:\nginx\html\"
 
   post_build:
 
     commands:
 
-      - echo "Configuring IIS"
+      - echo "Restarting Nginx"
 
-      - powershell Restart-Service W3SVC
+      - powershell Stop-Process -Name nginx -Force
+
+      - powershell Start-Process -FilePath "C:\nginx\nginx.exe"
 
 artifacts:
 
