@@ -8,29 +8,25 @@ phases:
 
       - echo "Downloading and installing Nginx for Windows"
 
-      - powershell Invoke-WebRequest -Uri "https://nginx.org/download/nginx-1.24.0.zip" -OutFile "nginx.zip"
+      - powershell Invoke-WebRequest -Uri "https://nginx.org/download/nginx-1.24.0.zip" -OutFile "C:\nginx.zip"
 
-      - powershell Expand-Archive nginx.zip -DestinationPath C:\nginx
-
-      - powershell Start-Process -FilePath "C:\nginx\nginx.exe"
+      - powershell Expand-Archive -Path "C:\nginx.zip" -DestinationPath "C:\"
 
   build:
 
     commands:
 
-      - echo "Build started on $(Get-Date)"
+      - echo "Starting Nginx"
 
-      - Copy-Item index.html -Destination "C:\nginx\html\"
+      - powershell Start-Process -FilePath "C:\nginx\nginx.exe" -NoNewWindow -Wait
 
   post_build:
 
     commands:
 
-      - echo "Restarting Nginx"
+      - echo "Allowing Nginx in firewall"
 
-      - powershell Stop-Process -Name nginx -Force
-
-      - powershell Start-Process -FilePath "C:\nginx\nginx.exe"
+      - powershell New-NetFirewallRule -DisplayName "Allow Nginx" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
 
 artifacts:
 
