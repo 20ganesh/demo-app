@@ -12,51 +12,35 @@ phases:
 
       - echo "Checking if Chocolatey is installed..."
 
-      - if not exist "C:\ProgramData\chocolatey\bin\choco.exe" (
+      - if exist "C:\ProgramData\chocolatey\bin\choco.exe" (
 
-            echo "Installing Chocolatey..." &&
-
-            powershell -Command "[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+            echo "Chocolatey already installed."
 
         ) else (
 
-            echo "Chocolatey already installed."
+            echo "Installing Chocolatey..."
+
+            powershell -Command "[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
 
         )
 
       - echo "Refreshing environment..."
 
-      - set "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
+      - refreshenv || echo "refreshenv command not found"
 
-      - echo "Verifying Chocolatey..."
+      - echo "Verifying Chocolatey installation..."
 
       - choco -v
+
+  build:
+
+    commands:
 
       - echo "Installing Nginx..."
 
       - choco install nginx -y --force
 
       - echo "Nginx installation completed."
-
-  build:
-
-    commands:
-
-      - echo "Starting Nginx..."
-
-      - Start-Process -FilePath "C:\tools\nginx\nginx.exe" -NoNewWindow
-
-      - echo "Nginx started."
-
-  post_build:
-
-    commands:
-
-      - echo "Allowing Nginx through firewall..."
-
-      - powershell -Command "New-NetFirewallRule -DisplayName 'Allow Nginx' -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow"
-
-      - echo "Firewall rule added."
 
 artifacts:
 
