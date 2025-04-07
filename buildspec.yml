@@ -1,26 +1,25 @@
 version: 0.2
 phases:
-  install:
-    commands:
-      - echo "Setting execution policy..."
-      - powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force"
-      - echo "Checking if Chocolatey is installed..."
-      - powershell -Command "if (!(Test-Path
-        'C:\ProgramData\chocolatey\bin\choco.exe')) { Write-Host 'Installing
-        Chocolatey...'; [System.Net.ServicePointManager]::SecurityProtocol =
-        'Tls12'; iex ((New-Object
-        System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-        } else { Write-Host 'Chocolatey already installed.' }"
-      - echo "Manually adding Chocolatey to PATH..."
-      - SET "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
-      - echo "PATH updated:%PATH%"
-      - echo "Verifying Chocolatey installation..."
-      - choco -v
-  build:
-    commands:
-      - echo "Installing Nginx..."
-      - choco install nginx -y --force
-      - echo "Nginx installation completed."
+ install:
+   runtime-versions:
+     # Specify windows runtime if needed; you can skip this if not needed
+   commands:
+     - echo Installing Chocolatey...
+     - Set-ExecutionPolicy Bypass -Scope Process -Force
+     - [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+     - iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+     - choco --version
+ pre_build:
+   commands:
+     - echo Installing nginx using Chocolatey...
+     - choco install nginx -y --force
+ build:
+   commands:
+     - echo Starting Build...
+     # You can add your build commands here
+ post_build:
+   commands:
+     - echo Build completed successfully.
 artifacts:
-  files:
-    - index.html
+ files:
+   - '**/*'
