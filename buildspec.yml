@@ -9,8 +9,8 @@ phases:
      - choco --version
  pre_build:
    commands:
-     - echo Installing nginx using Chocolatey...
-     - choco install nginx -y --force
+    - echo Installing nginx using Chocolatey
+    - choco install nginx -y --force
  build:
    commands:
      - echo Build phase started.
