@@ -2,16 +2,16 @@ version: 0.2
 phases:
  install:
    commands:
-     - echo Installing phase - no dependencies for static website
- pre_build:
-   commands:
-     - echo Pre-Build phase - nothing to do
+     - echo "Installing IIS (Windows Web Server)"
+     - powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools
  build:
    commands:
-     - echo Build phase - no build steps needed for static HTML
+     - echo "Build started on $(Get-Date)"
+     - Copy-Item index.html -Destination "C:\inetpub\wwwroot\"
  post_build:
    commands:
-     - echo Post-Build phase - build completed successfully
+     - echo "Configuring IIS"
+     - powershell Restart-Service W3SVC
 artifacts:
  files:
    - '**/*'
