@@ -1,25 +1,42 @@
 version: 0.2
+
 phases:
- install:
-   runtime-versions:
-     # Specify windows runtime if needed; you can skip this if not needed
-   commands:
-     - echo Installing Chocolatey...
-     - Set-ExecutionPolicy Bypass -Scope Process -Force
-     - [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-     - iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-     - choco --version
- pre_build:
-   commands:
-     - echo Installing nginx using Chocolatey...
-     - choco install nginx -y --force
- build:
-   commands:
-     - echo Starting Build...
-     # You can add your build commands here
- post_build:
-   commands:
-     - echo Build completed successfully.
+
+  install:
+
+    commands:
+
+      - echo Installing Chocolatey...
+
+      - Set-ExecutionPolicy Bypass -Scope Process -Force
+
+      - [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+
+      - iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      - choco --version
+
+  pre_build:
+
+    commands:
+
+      - echo Installing nginx using Chocolatey...
+
+      - choco install nginx -y --force
+
+  build:
+
+    commands:
+
+      - echo Build phase started.
+
+  post_build:
+
+    commands:
+
+      - echo Build completed successfully.
+
 artifacts:
- files:
-   - '**/*'
+
+  files:
+    - '**/*' 
