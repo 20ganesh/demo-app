@@ -14,4 +14,4 @@ phases:
      - powershell Restart-Service W3SVC
 artifacts:
  files:
-   - index.html
+   - '**/*'
