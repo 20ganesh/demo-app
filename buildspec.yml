@@ -14,4 +14,8 @@ phases:
      - powershell Restart-Service W3SVC
 artifacts:
  files:
-   - '**/*'
+   - appspec.yml
+   - scripts/**/*
+   - "*.html"
+   #- '**/*'
+ base-directory: . 
