@@ -13,11 +13,19 @@ phases:
      - echo "Build started on $(Get-Date)"
      - Copy-Item index.html -Destination "C:\nginx\html\" -Force
  post_build:
-   commands:
-     - echo "Restarting Nginx..."
-     - cd C:\nginx
-     - .\nginx.exe -s reload
-     - echo "Deployment complete."
+ commands:
+   - echo "Checking if Nginx is running..."
+   - cd C:\nginx
+   - |
+     $running = Get-Process nginx -ErrorAction SilentlyContinue
+     if ($running) {
+       echo "Nginx is running, reloading..."
+       .\nginx.exe -s reload
+     } else {
+       echo "Nginx not running, starting it..."
+       .\nginx.exe
+     }
+   - echo "Post build done"
 artifacts:
  files:
    - "**/*"
