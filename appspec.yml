@@ -1,12 +1,18 @@
 version: 0.0
 os: windows
 files:
- - source: \
-   destination: C:\nginx\html
+ - source: /
+   destination: C:\inetpub\wwwroot
 hooks:
  BeforeInstall:
-   - location: scripts\install_nginx.ps1
+   - location: scripts\install_iis.ps1
      timeout: 300
+     runas: Administrator
  AfterInstall:
-   - location: scripts\start_nginx.ps1
+   - location: scripts\copy_files.ps1
      timeout: 300
+     runas: Administrator
+ ApplicationStart:
+   - location: scripts\start_iis.ps1
+     timeout: 300
+     runas: Administrator
