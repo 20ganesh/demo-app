@@ -2,20 +2,22 @@ version: 0.2
 phases:
  install:
    commands:
-     - echo "Installing IIS (Windows Web Server)"
-     - powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools
+     - echo "Installing Nginx..."
+     - if (!(Test-Path "C:\nginx")) {
+         Invoke-WebRequest -Uri "http://nginx.org/download/nginx-1.24.0.zip" -OutFile "nginx.zip";
+         Expand-Archive nginx.zip -DestinationPath C:\;
+         Rename-Item -Path "C:\nginx-1.24.0" -NewName "nginx";
+       }
  build:
    commands:
      - echo "Build started on $(Get-Date)"
-     - Copy-Item index.html -Destination "C:\inetpub\wwwroot\"
+     - Copy-Item index.html -Destination "C:\nginx\html\" -Force
  post_build:
    commands:
-     - echo "Configuring IIS"
-     - powershell Restart-Service W3SVC
+     - echo "Restarting Nginx..."
+     - cd C:\nginx
+     - .\nginx.exe -s reload
+     - echo "Deployment complete."
 artifacts:
  files:
-   - appspec.yml
-   - scripts/**/*
-   - "*.html"
-   #- '**/*'
- base-directory: . 
+   - "**/*"
