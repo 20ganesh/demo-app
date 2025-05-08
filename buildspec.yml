@@ -4,6 +4,7 @@ phases:
    commands:
      - echo "Installing IIS (Windows Web Server)"
      - powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools
+     - pwsh scripts/check_iis.ps1 -RemoteServer "demo-app-ec2"
  build:
    commands:
      - echo "Build started on $(Get-Date)"
